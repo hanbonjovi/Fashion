@@ -20,6 +20,37 @@ const parser = new XMLParser({
   allowBooleanAttributes: true,
 });
 
+// Refine long bloggy headlines to focus on the fashion product
+function refineTitle(title) {
+  if (!title || title.length <= 50) return title;
+
+  // Split on common blog title separators and take the most product-focused part
+  const separators = /\s*[—–\-:]\s*/;
+  const parts = title.split(separators).filter((p) => p.length > 5);
+
+  if (parts.length > 1) {
+    // Find the part most likely about fashion (contains fashion keywords)
+    const fashionWords = /\b(dress|coat|blazer|jacket|trouser|pant|skirt|bag|tote|shoe|boot|sneaker|knit|sweater|cardigan|shirt|denim|jean|suit|silk|leather|cashmere|linen|wool|cotton|collection|collab|style|look|outfit|wear|trend|chic|luxur|designer|runway|spring|summer|fall|winter|resort)\b/i;
+
+    const fashionPart = parts.find((p) => fashionWords.test(p));
+    if (fashionPart && fashionPart.length >= 15) {
+      return fashionPart.trim();
+    }
+
+    // Otherwise take the longest meaningful part (likely the descriptive one)
+    const longest = parts.reduce((a, b) => (a.length >= b.length ? a : b));
+    if (longest.length <= 80) return longest.trim();
+  }
+
+  // If still too long, truncate at a natural break
+  if (title.length > 80) {
+    const truncated = title.substring(0, 80).replace(/\s+\S*$/, '');
+    return truncated + '...';
+  }
+
+  return title;
+}
+
 function extractImage(item) {
   // Try media:content
   if (item['media:content'] && item['media:content']['@_url']) {
@@ -89,7 +120,7 @@ async function fetchFeed(feedConfig) {
     const items = Array.isArray(channel.item) ? channel.item : [channel.item];
 
     return items.slice(0, 5).map((item) => ({
-      title: item.title || 'Untitled',
+      title: refineTitle(item.title || 'Untitled'),
       excerpt: extractExcerpt(item),
       source: feedConfig.source,
       sourceUrl: item.link || feedConfig.url,
