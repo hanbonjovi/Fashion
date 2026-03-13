@@ -3,166 +3,134 @@
    App logic, data, and interactivity
    ======================================== */
 
-// ---- Fashion Data ----
-const fashionItems = [
+// ---- Fallback Data (used when RSS feeds are unavailable) ----
+const fallbackItems = [
   {
-    id: 1,
-    name: "Sculptural Wool Coat",
-    designer: "Acne Studios",
-    price: 1890,
-    description: "An architectural masterpiece in double-faced wool. This oversized coat features clean, sculptural lines with dropped shoulders and a dramatic drape that moves beautifully. The perfect statement piece for the modern minimalist.",
-    material: "100% Virgin Wool",
-    season: "Autumn/Winter 2026",
-    sizes: "XS, S, M, L, XL",
-    color: "#d4c5b0",
-    purchaseUrl: "https://www.acnestudios.com",
-    image: "https://images.unsplash.com/photo-1539533113208-f6df8cc8b543?w=800&q=80",
-    gallery: "https://images.unsplash.com/photo-1539533113208-f6df8cc8b543?w=1200&q=80",
-    tag: "Outerwear"
+    title: "Sculptural Wool Coat",
+    excerpt: "An architectural masterpiece in double-faced wool. This oversized coat features clean, sculptural lines with dropped shoulders and a dramatic drape that moves beautifully.",
+    source: "Acne Studios",
+    sourceUrl: "https://www.acnestudios.com",
+    imageUrl: "https://images.unsplash.com/photo-1539533113208-f6df8cc8b543?w=800&q=80",
+    publishedAt: new Date().toISOString(),
+    category: "Outerwear"
   },
   {
-    id: 2,
-    name: "Silk Draped Midi Dress",
-    designer: "The Row",
-    price: 2450,
-    description: "Effortless elegance defined. This fluid silk charmeuse dress features an asymmetric drape at the waist and a subtle cowl neckline. The bias cut ensures a flattering silhouette that skims the body with grace.",
-    material: "100% Mulberry Silk",
-    season: "Spring/Summer 2026",
-    sizes: "XS, S, M, L",
-    color: "#e8ddd0",
-    purchaseUrl: "https://www.therow.com",
-    image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
-    gallery: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=1200&q=80",
-    tag: "Dresses"
+    title: "Silk Draped Midi Dress",
+    excerpt: "Effortless elegance defined. This fluid silk charmeuse dress features an asymmetric drape at the waist and a subtle cowl neckline.",
+    source: "The Row",
+    sourceUrl: "https://www.therow.com",
+    imageUrl: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
+    publishedAt: new Date().toISOString(),
+    category: "Dresses"
   },
   {
-    id: 3,
-    name: "Tailored Wide-Leg Trousers",
-    designer: "Lemaire",
-    price: 890,
-    description: "The foundation of a considered wardrobe. These wide-leg trousers are cut from a Japanese cotton-wool blend with a high rise and deep pleats. Relaxed yet refined, they pair effortlessly with everything from knits to blazers.",
-    material: "Cotton-Wool Blend",
-    season: "Resort 2026",
-    sizes: "S, M, L, XL",
-    color: "#c4b8a8",
-    purchaseUrl: "https://www.lemaire.fr",
-    image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&q=80",
-    gallery: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1200&q=80",
-    tag: "Trousers"
+    title: "Tailored Wide-Leg Trousers",
+    excerpt: "The foundation of a considered wardrobe. These wide-leg trousers are cut from a Japanese cotton-wool blend with a high rise and deep pleats.",
+    source: "Lemaire",
+    sourceUrl: "https://www.lemaire.fr",
+    imageUrl: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&q=80",
+    publishedAt: new Date().toISOString(),
+    category: "Trousers"
   },
   {
-    id: 4,
-    name: "Cashmere Oversized Knit",
-    designer: "Khaite",
-    price: 1680,
-    description: "Luxurious simplicity at its finest. This generously proportioned cashmere sweater features a rolled neckline and elongated sleeves. The chunky gauge creates beautiful texture while remaining incredibly lightweight.",
-    material: "100% Mongolian Cashmere",
-    season: "Autumn/Winter 2026",
-    sizes: "XS, S, M, L",
-    color: "#d9cfc2",
-    purchaseUrl: "https://www.khaite.com",
-    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80",
-    gallery: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1200&q=80",
-    tag: "Knitwear"
+    title: "Cashmere Oversized Knit",
+    excerpt: "Luxurious simplicity at its finest. This generously proportioned cashmere sweater features a rolled neckline and elongated sleeves.",
+    source: "Khaite",
+    sourceUrl: "https://www.khaite.com",
+    imageUrl: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80",
+    publishedAt: new Date().toISOString(),
+    category: "Knitwear"
   },
   {
-    id: 5,
-    name: "Leather Minimal Tote",
-    designer: "Bottega Veneta",
-    price: 3200,
-    description: "The ultimate everyday luxury. Crafted from supple nappa leather with Bottega's signature intrecciato weave detail at the base. Unlined for a soft, relaxed shape with ample room for all daily essentials.",
-    material: "Nappa Leather",
-    season: "Pre-Fall 2026",
-    sizes: "One Size",
-    color: "#b8a992",
-    purchaseUrl: "https://www.bottegaveneta.com",
-    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=80",
-    gallery: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=1200&q=80",
-    tag: "Accessories"
+    title: "Leather Minimal Tote",
+    excerpt: "The ultimate everyday luxury. Crafted from supple nappa leather with Bottega's signature intrecciato weave detail at the base.",
+    source: "Bottega Veneta",
+    sourceUrl: "https://www.bottegaveneta.com",
+    imageUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=80",
+    publishedAt: new Date().toISOString(),
+    category: "Accessories"
   },
   {
-    id: 6,
-    name: "Deconstructed Linen Blazer",
-    designer: "Jacquemus",
-    price: 1250,
-    description: "Mediterranean ease meets Parisian tailoring. This unstructured single-breasted blazer is cut from washed French linen with a slightly cropped hem and relaxed shoulders. Perfectly imperfect.",
-    material: "100% French Linen",
-    season: "Spring/Summer 2026",
-    sizes: "S, M, L, XL",
-    color: "#e0d5c5",
-    purchaseUrl: "https://www.jacquemus.com",
-    image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=80",
-    gallery: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=1200&q=80",
-    tag: "Blazers"
-  },
-  {
-    id: 7,
-    name: "Pleated Satin Skirt",
-    designer: "Toteme",
-    price: 760,
-    description: "Movement captured in fabric. This midi-length skirt features permanent knife pleats in lustrous recycled satin. The fluid drape creates a mesmerizing effect with every step, making it equal parts art and garment.",
-    material: "Recycled Polyester Satin",
-    season: "Spring/Summer 2026",
-    sizes: "XS, S, M, L",
-    color: "#ccc3b5",
-    purchaseUrl: "https://www.toteme-studio.com",
-    image: "https://images.unsplash.com/photo-1583496661160-fb5886a0uj9a?w=800&q=80",
-    gallery: "https://images.unsplash.com/photo-1583496661160-fb5886a0uj9a?w=1200&q=80",
-    tag: "Skirts"
+    title: "Deconstructed Linen Blazer",
+    excerpt: "Mediterranean ease meets Parisian tailoring. This unstructured single-breasted blazer is cut from washed French linen.",
+    source: "Jacquemus",
+    sourceUrl: "https://www.jacquemus.com",
+    imageUrl: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=80",
+    publishedAt: new Date().toISOString(),
+    category: "Blazers"
   }
 ];
 
-// Day names for cycling
-const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
 // ---- State ----
-let currentIndex = 0;
+let pickOfTheDay = null;
+let trendingItems = [];
 
 // ---- DOM Elements ----
 const heroTitle = document.getElementById('hero-title');
 const heroSubtitle = document.getElementById('hero-subtitle');
-const heroPrice = document.getElementById('hero-price');
-const heroDesigner = document.getElementById('hero-designer');
+const heroSource = document.getElementById('hero-source');
+const heroDate = document.getElementById('hero-date');
 const heroImage = document.getElementById('hero-image');
 const heroCta = document.getElementById('hero-cta');
-const dayLabel = document.getElementById('day-label');
-const prevBtn = document.getElementById('prev-day');
-const nextBtn = document.getElementById('next-day');
 
 const detailPanel = document.getElementById('detail-panel');
 const detailClose = document.getElementById('detail-close');
 const detailTitle = document.getElementById('detail-title');
-const detailDesigner = document.getElementById('detail-designer');
+const detailSourceName = document.getElementById('detail-source-name');
 const detailDescription = document.getElementById('detail-description');
-const detailMaterial = document.getElementById('detail-material');
-const detailSeason = document.getElementById('detail-season');
-const detailSizes = document.getElementById('detail-sizes');
-const detailPrice = document.getElementById('detail-price');
-const detailPurchase = document.getElementById('detail-purchase');
+const detailSource = document.getElementById('detail-source');
+const detailDate = document.getElementById('detail-date');
+const detailCategory = document.getElementById('detail-category');
+const detailReadMore = document.getElementById('detail-read-more');
 const detailGallery = document.getElementById('detail-gallery');
 
 const marqueeTrack = document.getElementById('marquee-track');
 
-// ---- Render Hero ----
-function renderHero(index, direction = 'none') {
-  const item = fashionItems[index];
+// ---- Helpers ----
+function formatDate(dateStr) {
+  try {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      month: 'long', day: 'numeric', year: 'numeric'
+    });
+  } catch {
+    return '';
+  }
+}
 
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ---- Fetch RSS Feeds ----
+async function fetchFashionFeeds() {
+  try {
+    const response = await fetch('/.netlify/functions/fetch-fashion-feeds');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (data.fallback) return null;
+    return data;
+  } catch (err) {
+    console.warn('RSS fetch failed, using fallback data:', err);
+    return null;
+  }
+}
+
+// ---- Render Hero ----
+function renderHero(item) {
   heroImage.style.opacity = '0';
   heroTitle.style.opacity = '0';
   heroSubtitle.style.opacity = '0';
 
   setTimeout(() => {
-    heroTitle.textContent = item.name;
-    heroSubtitle.textContent = item.description;
-    heroPrice.textContent = `$${item.price.toLocaleString()}`;
-    heroDesigner.textContent = item.designer;
-    heroImage.style.backgroundImage = `url(${item.image})`;
-    dayLabel.textContent = dayNames[index % dayNames.length];
+    heroTitle.textContent = item.title;
+    heroSubtitle.textContent = item.excerpt;
+    heroSource.textContent = item.source;
+    heroDate.textContent = formatDate(item.publishedAt);
+    heroImage.style.backgroundImage = `url(${item.imageUrl})`;
 
-    heroCta.onclick = (e) => {
-      e.preventDefault();
-      openDetail(index);
-    };
+    heroCta.href = item.sourceUrl;
 
     heroImage.style.opacity = '1';
     heroTitle.style.opacity = '1';
@@ -170,43 +138,17 @@ function renderHero(index, direction = 'none') {
   }, 300);
 }
 
-// ---- Navigation ----
-prevBtn.addEventListener('click', () => {
-  currentIndex = (currentIndex - 1 + fashionItems.length) % fashionItems.length;
-  renderHero(currentIndex, 'prev');
-});
-
-nextBtn.addEventListener('click', () => {
-  currentIndex = (currentIndex + 1) % fashionItems.length;
-  renderHero(currentIndex, 'next');
-});
-
-// Keyboard navigation
-document.addEventListener('keydown', (e) => {
-  if (detailPanel.classList.contains('open')) {
-    if (e.key === 'Escape') closeDetail();
-    return;
-  }
-  if (e.key === 'ArrowLeft') prevBtn.click();
-  if (e.key === 'ArrowRight') nextBtn.click();
-});
-
 // ---- Detail Panel ----
-function openDetail(index) {
-  const item = fashionItems[index];
+function openDetail(item) {
+  detailTitle.textContent = item.title;
+  detailSourceName.textContent = `From ${item.source}`;
+  detailDescription.textContent = item.excerpt;
+  detailSource.textContent = item.source;
+  detailDate.textContent = formatDate(item.publishedAt);
+  detailCategory.textContent = item.category || 'Fashion';
+  detailReadMore.href = item.sourceUrl;
 
-  detailTitle.textContent = item.name;
-  detailDesigner.textContent = `By ${item.designer}`;
-  detailDescription.textContent = item.description;
-  detailMaterial.textContent = item.material;
-  detailSeason.textContent = item.season;
-  detailSizes.textContent = item.sizes;
-  detailPrice.textContent = `$${item.price.toLocaleString()}`;
-  detailPurchase.href = item.purchaseUrl;
-  detailPurchase.target = '_blank';
-  detailPurchase.rel = 'noopener noreferrer';
-
-  detailGallery.innerHTML = `<img src="${item.gallery}" alt="${item.name}" loading="lazy">`;
+  detailGallery.innerHTML = `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.title)}" loading="lazy">`;
 
   detailPanel.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -223,21 +165,28 @@ detailPanel.addEventListener('click', (e) => {
   if (e.target === detailPanel) closeDetail();
 });
 
+// Keyboard: Escape to close detail
+document.addEventListener('keydown', (e) => {
+  if (detailPanel.classList.contains('open') && e.key === 'Escape') {
+    closeDetail();
+  }
+});
+
 // ---- Trending ----
 function renderTrending() {
   marqueeTrack.innerHTML = '';
 
-  fashionItems.forEach((item, index) => {
+  trendingItems.forEach((item) => {
     const el = document.createElement('div');
     el.className = 'marquee-item';
     el.innerHTML = `
       <div class="marquee-img-wrapper">
-        <img class="marquee-img" src="${item.image}" alt="${item.name}" loading="lazy">
+        <img class="marquee-img" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.title)}" loading="lazy">
       </div>
-      <p class="marquee-name">${item.name}</p>
-      <p class="marquee-price">$${item.price.toLocaleString()}</p>
+      <p class="marquee-name">${escapeHtml(item.title)}</p>
+      <p class="marquee-source">${escapeHtml(item.source)}</p>
     `;
-    el.addEventListener('click', () => openDetail(index));
+    el.addEventListener('click', () => openDetail(item));
     marqueeTrack.appendChild(el);
   });
 }
@@ -268,13 +217,19 @@ document.querySelector('.nav-toggle').addEventListener('click', function() {
 });
 
 // ---- Init ----
-function init() {
-  // Set initial day based on actual day of week
-  const today = new Date().getDay();
-  currentIndex = today === 0 ? 6 : today - 1; // Map Sunday=0 -> 6, Mon=0
-  currentIndex = currentIndex % fashionItems.length;
+async function init() {
+  const data = await fetchFashionFeeds();
 
-  renderHero(currentIndex);
+  if (data && data.pickOfTheDay) {
+    pickOfTheDay = data.pickOfTheDay;
+    trendingItems = data.trending || [];
+  } else {
+    // Use fallback static data
+    pickOfTheDay = fallbackItems[0];
+    trendingItems = fallbackItems.slice(1);
+  }
+
+  renderHero(pickOfTheDay);
   renderTrending();
 
   window.addEventListener('scroll', handleScroll, { passive: true });

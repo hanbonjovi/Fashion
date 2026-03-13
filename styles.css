@@ -178,18 +178,17 @@ body {
   margin-bottom: 2.5rem;
 }
 
-.hero-price {
-  font-family: var(--serif);
-  font-size: 1.75rem;
-  font-weight: 700;
+.hero-source {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--black);
 }
 
-.hero-designer {
+.hero-date {
   font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-weight: 400;
   color: var(--warm-gray);
   padding-left: 2rem;
   border-left: 1px solid var(--warm-gray);
@@ -212,47 +211,6 @@ body {
 
 .hero-image:hover {
   transform: scale(1.03);
-}
-
-.hero-nav {
-  position: absolute;
-  bottom: 3rem;
-  left: 6rem;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.hero-nav-btn {
-  width: 48px;
-  height: 48px;
-  border: 1px solid var(--warm-gray);
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(8px);
-  border-radius: 50%;
-  font-size: 1.1rem;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  transition: all 0.3s;
-  color: var(--black);
-}
-
-.hero-nav-btn:hover {
-  background: var(--black);
-  border-color: var(--black);
-  color: var(--white);
-}
-
-.hero-day-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-light);
-  min-width: 100px;
-  text-align: center;
 }
 
 /* ---- Buttons ---- */
@@ -367,7 +325,7 @@ body {
   margin-bottom: 0.5rem;
 }
 
-.detail-designer {
+.detail-source-name {
   font-size: 0.8rem;
   font-weight: 500;
   letter-spacing: 0.1em;
@@ -413,17 +371,8 @@ body {
 }
 
 .detail-price-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding-top: 2rem;
   border-top: 1px solid #eee;
-}
-
-.detail-price {
-  font-family: var(--serif);
-  font-size: 2rem;
-  font-weight: 700;
 }
 
 .btn-purchase {
@@ -518,9 +467,39 @@ body {
   margin-bottom: 0.25rem;
 }
 
-.marquee-price {
+.marquee-source {
   font-size: 0.8rem;
   color: var(--warm-gray);
+}
+
+/* ---- Social Feed ---- */
+.social-feed {
+  padding: 6rem 2rem;
+  background: var(--cream);
+  text-align: center;
+}
+
+.social-embed-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.social-placeholder {
+  padding: 4rem 2rem;
+  border: 2px dashed var(--warm-gray);
+  border-radius: 8px;
+  color: var(--text-light);
+}
+
+.social-placeholder-text {
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.social-placeholder-hint {
+  font-size: 0.85rem;
+  font-weight: 300;
 }
 
 /* ---- Footer ---- */
@@ -616,11 +595,6 @@ body {
     height: 60vh;
   }
 
-  .hero-nav {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
   .hero-overlay {
     background: linear-gradient(180deg, rgba(245,240,235,0.95) 30%, rgba(245,240,235,0.4));
   }
@@ -652,10 +626,6 @@ body {
     padding: 7rem 1.5rem 2rem;
   }
 
-  .hero-nav {
-    bottom: 1.5rem;
-  }
-
   .detail-price-row {
     flex-direction: column;
     gap: 1.5rem;
@@ -665,5 +635,9 @@ body {
   .btn-purchase {
     width: 100%;
     text-align: center;
+  }
+
+  .social-feed {
+    padding: 4rem 1.5rem;
   }
 }

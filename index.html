@@ -18,6 +18,7 @@
       <div class="nav-links">
         <a href="#featured">Today's Pick</a>
         <a href="#trending">Trending</a>
+        <a href="#social">Social</a>
       </div>
       <button class="nav-toggle" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -33,48 +34,42 @@
       <h1 class="hero-title" id="hero-title"></h1>
       <p class="hero-subtitle" id="hero-subtitle"></p>
       <div class="hero-meta">
-        <span class="hero-price" id="hero-price"></span>
-        <span class="hero-designer" id="hero-designer"></span>
+        <span class="hero-source" id="hero-source"></span>
+        <span class="hero-date" id="hero-date"></span>
       </div>
-      <a href="#" class="btn btn-primary" id="hero-cta">Shop Now</a>
+      <a href="#" class="btn btn-primary" id="hero-cta" target="_blank" rel="noopener noreferrer">Read Article</a>
     </div>
     <div class="hero-image-wrapper">
       <div class="hero-image" id="hero-image"></div>
     </div>
-    <div class="hero-nav">
-      <button class="hero-nav-btn" id="prev-day" aria-label="Previous">&larr;</button>
-      <span class="hero-day-label" id="day-label"></span>
-      <button class="hero-nav-btn" id="next-day" aria-label="Next">&rarr;</button>
-    </div>
   </header>
 
-  <!-- Details Panel (slides in on click) -->
+  <!-- Details Panel -->
   <section class="detail-panel" id="detail-panel">
     <button class="detail-close" id="detail-close">&times;</button>
     <div class="detail-inner">
       <div class="detail-gallery" id="detail-gallery"></div>
       <div class="detail-info">
-        <p class="detail-label">Featured Piece</p>
+        <p class="detail-label">Featured Article</p>
         <h2 class="detail-title" id="detail-title"></h2>
-        <p class="detail-designer" id="detail-designer"></p>
+        <p class="detail-source-name" id="detail-source-name"></p>
         <p class="detail-description" id="detail-description"></p>
         <div class="detail-specs">
           <div class="spec">
-            <span class="spec-label">Material</span>
-            <span class="spec-value" id="detail-material"></span>
+            <span class="spec-label">Source</span>
+            <span class="spec-value" id="detail-source"></span>
           </div>
           <div class="spec">
-            <span class="spec-label">Season</span>
-            <span class="spec-value" id="detail-season"></span>
+            <span class="spec-label">Published</span>
+            <span class="spec-value" id="detail-date"></span>
           </div>
           <div class="spec">
-            <span class="spec-label">Available Sizes</span>
-            <span class="spec-value" id="detail-sizes"></span>
+            <span class="spec-label">Category</span>
+            <span class="spec-value" id="detail-category"></span>
           </div>
         </div>
         <div class="detail-price-row">
-          <span class="detail-price" id="detail-price"></span>
-          <a href="#" class="btn btn-primary btn-purchase" id="detail-purchase">Purchase &rarr;</a>
+          <a href="#" class="btn btn-primary btn-purchase" id="detail-read-more" target="_blank" rel="noopener noreferrer">Read Full Article &rarr;</a>
         </div>
       </div>
     </div>
@@ -91,6 +86,20 @@
     </div>
   </section>
 
+  <!-- Social Feed -->
+  <section class="social-feed" id="social">
+    <div class="section-header">
+      <p class="section-label">On Social</p>
+      <h2 class="section-title">Style in the Wild</h2>
+    </div>
+    <div class="social-embed-wrapper" id="social-widget">
+      <div class="social-placeholder">
+        <p class="social-placeholder-text">Social media feed coming soon.</p>
+        <p class="social-placeholder-hint">Connect your Tagembed or Taggbox widget to display trending fashion from Instagram &amp; TikTok.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-inner">
@@ -99,8 +108,6 @@
       <div class="footer-links">
         <a href="#">About</a>
         <a href="#">Contact</a>
-        <a href="#">Shipping</a>
-        <a href="#">Returns</a>
       </div>
       <p class="footer-copy">&copy; 2026 CHARMZ. All rights reserved.</p>
     </div>
