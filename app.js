@@ -1,100 +1,63 @@
 /* ========================================
-   CHARMZ — Pick of the Day
+   CHARMZ — Curated Fashion Discovery
    App logic, data, and interactivity
    ======================================== */
 
-// ---- Fallback Data (used when RSS feeds are unavailable) ----
-const fallbackItems = [
-  {
-    title: "Sculptural Wool Coat",
-    excerpt: "An architectural masterpiece in double-faced wool. This oversized coat features clean, sculptural lines with dropped shoulders and a dramatic drape that moves beautifully.",
-    source: "Acne Studios",
-    sourceUrl: "https://www.acnestudios.com",
-    imageUrl: "https://images.unsplash.com/photo-1539533113208-f6df8cc8b543?w=800&q=80",
-    publishedAt: new Date().toISOString(),
-    category: "Outerwear"
-  },
-  {
-    title: "Silk Draped Midi Dress",
-    excerpt: "Effortless elegance defined. This fluid silk charmeuse dress features an asymmetric drape at the waist and a subtle cowl neckline.",
-    source: "The Row",
-    sourceUrl: "https://www.therow.com",
-    imageUrl: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80",
-    publishedAt: new Date().toISOString(),
-    category: "Dresses"
-  },
-  {
-    title: "Tailored Wide-Leg Trousers",
-    excerpt: "The foundation of a considered wardrobe. These wide-leg trousers are cut from a Japanese cotton-wool blend with a high rise and deep pleats.",
-    source: "Lemaire",
-    sourceUrl: "https://www.lemaire.fr",
-    imageUrl: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&q=80",
-    publishedAt: new Date().toISOString(),
-    category: "Trousers"
-  },
-  {
-    title: "Cashmere Oversized Knit",
-    excerpt: "Luxurious simplicity at its finest. This generously proportioned cashmere sweater features a rolled neckline and elongated sleeves.",
-    source: "Khaite",
-    sourceUrl: "https://www.khaite.com",
-    imageUrl: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80",
-    publishedAt: new Date().toISOString(),
-    category: "Knitwear"
-  },
-  {
-    title: "Leather Minimal Tote",
-    excerpt: "The ultimate everyday luxury. Crafted from supple nappa leather with Bottega's signature intrecciato weave detail at the base.",
-    source: "Bottega Veneta",
-    sourceUrl: "https://www.bottegaveneta.com",
-    imageUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=80",
-    publishedAt: new Date().toISOString(),
-    category: "Accessories"
-  },
-  {
-    title: "Deconstructed Linen Blazer",
-    excerpt: "Mediterranean ease meets Parisian tailoring. This unstructured single-breasted blazer is cut from washed French linen.",
-    source: "Jacquemus",
-    sourceUrl: "https://www.jacquemus.com",
-    imageUrl: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=80",
-    publishedAt: new Date().toISOString(),
-    category: "Blazers"
-  }
-];
-
 // ---- State ----
-let pickOfTheDay = null;
-let trendingItems = [];
+let featuredProduct = null;
+let allProducts = [];
+let activeFilter = 'all';
 
 // ---- DOM Elements ----
 const heroTitle = document.getElementById('hero-title');
 const heroSubtitle = document.getElementById('hero-subtitle');
-const heroSource = document.getElementById('hero-source');
-const heroDate = document.getElementById('hero-date');
+const heroBrand = document.getElementById('hero-brand');
+const heroPrice = document.getElementById('hero-price');
 const heroImage = document.getElementById('hero-image');
 const heroCta = document.getElementById('hero-cta');
 
 const detailPanel = document.getElementById('detail-panel');
 const detailClose = document.getElementById('detail-close');
+const detailLabel = document.getElementById('detail-label');
 const detailTitle = document.getElementById('detail-title');
-const detailSourceName = document.getElementById('detail-source-name');
+const detailBrand = document.getElementById('detail-brand');
+const detailPrice = document.getElementById('detail-price');
 const detailDescription = document.getElementById('detail-description');
-const detailSource = document.getElementById('detail-source');
-const detailDate = document.getElementById('detail-date');
-const detailCategory = document.getElementById('detail-category');
-const detailReadMore = document.getElementById('detail-read-more');
+const detailSpecBrand = document.getElementById('detail-spec-brand');
+const detailSpecCategory = document.getElementById('detail-spec-category');
+const detailBuy = document.getElementById('detail-buy');
 const detailGallery = document.getElementById('detail-gallery');
 
-const marqueeTrack = document.getElementById('marquee-track');
+const shopGrid = document.getElementById('shop-grid');
+const shopFilters = document.getElementById('shop-filters');
+const calendarGrid = document.getElementById('calendar-grid');
+const editorialTrack = document.getElementById('editorial-track');
+const editorialSection = document.getElementById('editorial');
 
 // ---- Helpers ----
-function formatDate(dateStr) {
-  try {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'long', day: 'numeric', year: 'numeric'
-    });
-  } catch {
-    return '';
+function formatPrice(price, currency) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency || 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price);
+}
+
+function formatDateRange(startDate, endDate) {
+  const start = new Date(startDate + 'T00:00:00');
+  const end = new Date(endDate + 'T00:00:00');
+  const opts = { month: 'short', day: 'numeric' };
+
+  if (startDate === endDate) {
+    return start.toLocaleDateString('en-US', { ...opts, year: 'numeric' });
   }
+
+  if (start.getMonth() === end.getMonth()) {
+    return `${start.toLocaleDateString('en-US', opts)} – ${end.getDate()}, ${end.getFullYear()}`;
+  }
+
+  return `${start.toLocaleDateString('en-US', opts)} – ${end.toLocaleDateString('en-US', { ...opts, year: 'numeric' })}`;
 }
 
 function escapeHtml(str) {
@@ -103,34 +66,19 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-// ---- Fetch RSS Feeds ----
-async function fetchFashionFeeds() {
-  try {
-    const response = await fetch('/.netlify/functions/fetch-fashion-feeds');
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    if (data.fallback) return null;
-    return data;
-  } catch (err) {
-    console.warn('RSS fetch failed, using fallback data:', err);
-    return null;
-  }
-}
-
 // ---- Render Hero ----
-function renderHero(item) {
+function renderHero(product) {
   heroImage.style.opacity = '0';
   heroTitle.style.opacity = '0';
   heroSubtitle.style.opacity = '0';
 
   setTimeout(() => {
-    heroTitle.textContent = item.title;
-    heroSubtitle.textContent = item.excerpt;
-    heroSource.textContent = item.source;
-    heroDate.textContent = formatDate(item.publishedAt);
-    heroImage.style.backgroundImage = `url(${item.imageUrl})`;
-
-    heroCta.href = item.sourceUrl;
+    heroTitle.textContent = product.title;
+    heroSubtitle.textContent = product.description;
+    heroBrand.textContent = product.brand;
+    heroPrice.textContent = formatPrice(product.price, product.currency);
+    heroImage.style.backgroundImage = `url(${product.imageUrl})`;
+    heroCta.href = product.buyUrl;
 
     heroImage.style.opacity = '1';
     heroTitle.style.opacity = '1';
@@ -139,16 +87,18 @@ function renderHero(item) {
 }
 
 // ---- Detail Panel ----
-function openDetail(item) {
-  detailTitle.textContent = item.title;
-  detailSourceName.textContent = `From ${item.source}`;
-  detailDescription.textContent = item.excerpt;
-  detailSource.textContent = item.source;
-  detailDate.textContent = formatDate(item.publishedAt);
-  detailCategory.textContent = item.category || 'Fashion';
-  detailReadMore.href = item.sourceUrl;
+function openDetail(product) {
+  detailLabel.textContent = product.category;
+  detailTitle.textContent = product.title;
+  detailBrand.textContent = product.brand;
+  detailPrice.textContent = formatPrice(product.price, product.currency);
+  detailDescription.textContent = product.description;
+  detailSpecBrand.textContent = product.brand;
+  detailSpecCategory.textContent = product.category;
+  detailBuy.href = product.buyUrl;
+  detailBuy.textContent = `Buy Now — ${formatPrice(product.price, product.currency)}`;
 
-  detailGallery.innerHTML = `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.title)}" loading="lazy">`;
+  detailGallery.innerHTML = `<img src="${escapeHtml(product.imageUrl)}" alt="${escapeHtml(product.title)}" loading="lazy">`;
 
   detailPanel.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -165,29 +115,112 @@ detailPanel.addEventListener('click', (e) => {
   if (e.target === detailPanel) closeDetail();
 });
 
-// Keyboard: Escape to close detail
 document.addEventListener('keydown', (e) => {
   if (detailPanel.classList.contains('open') && e.key === 'Escape') {
     closeDetail();
   }
 });
 
-// ---- Trending ----
-function renderTrending() {
-  marqueeTrack.innerHTML = '';
+// ---- Shop Grid ----
+function renderShopGrid(products) {
+  shopGrid.innerHTML = '';
 
-  trendingItems.forEach((item) => {
+  products.forEach((product) => {
     const el = document.createElement('div');
-    el.className = 'marquee-item';
+    el.className = 'product-card';
     el.innerHTML = `
-      <div class="marquee-img-wrapper">
-        <img class="marquee-img" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.title)}" loading="lazy">
+      ${product.isNew ? '<span class="product-card-badge">New</span>' : ''}
+      <div class="product-card-img">
+        <img src="${escapeHtml(product.imageUrl)}" alt="${escapeHtml(product.title)}" loading="lazy">
       </div>
-      <p class="marquee-name">${escapeHtml(item.title)}</p>
-      <p class="marquee-source">${escapeHtml(item.source)}</p>
+      <p class="product-card-brand">${escapeHtml(product.brand)}</p>
+      <p class="product-card-title">${escapeHtml(product.title)}</p>
+      <p class="product-card-price">${formatPrice(product.price, product.currency)}</p>
     `;
-    el.addEventListener('click', () => openDetail(item));
-    marqueeTrack.appendChild(el);
+    el.addEventListener('click', () => openDetail(product));
+    shopGrid.appendChild(el);
+  });
+}
+
+function initFilters(products) {
+  const categories = ['All', ...new Set(products.map((p) => p.category))];
+
+  shopFilters.innerHTML = '';
+  categories.forEach((cat) => {
+    const btn = document.createElement('button');
+    btn.className = 'shop-filter-btn' + (cat === 'All' ? ' active' : '');
+    btn.textContent = cat;
+    btn.addEventListener('click', () => {
+      activeFilter = cat === 'All' ? 'all' : cat;
+      document.querySelectorAll('.shop-filter-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filtered = activeFilter === 'all'
+        ? allProducts
+        : allProducts.filter((p) => p.category === activeFilter);
+      renderShopGrid(filtered);
+    });
+    shopFilters.appendChild(btn);
+  });
+}
+
+// ---- Fashion Calendar ----
+function renderCalendar(events) {
+  const now = new Date();
+  const upcoming = events
+    .filter((e) => new Date(e.endDate + 'T23:59:59') >= now)
+    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+  calendarGrid.innerHTML = '';
+
+  upcoming.forEach((event) => {
+    const typeLabel = event.type.replace('-', ' ');
+    const el = document.createElement('a');
+    el.className = 'event-card';
+    el.href = event.url || '#';
+    el.target = '_blank';
+    el.rel = 'noopener noreferrer';
+    el.innerHTML = `
+      <p class="event-date-range">${formatDateRange(event.startDate, event.endDate)}</p>
+      <h3 class="event-name">${escapeHtml(event.name)}</h3>
+      <p class="event-subtitle">${escapeHtml(event.subtitle)}</p>
+      <p class="event-location">${escapeHtml(event.location)}<span class="event-badge">${escapeHtml(typeLabel)}</span></p>
+    `;
+    calendarGrid.appendChild(el);
+  });
+}
+
+// ---- Editorial (RSS) ----
+async function fetchFashionFeeds() {
+  try {
+    const response = await fetch('/.netlify/functions/fetch-fashion-feeds');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (data.fallback) return null;
+    return data;
+  } catch (err) {
+    console.warn('RSS fetch failed:', err);
+    return null;
+  }
+}
+
+function renderEditorial(articles) {
+  editorialTrack.innerHTML = '';
+
+  articles.forEach((article) => {
+    const el = document.createElement('a');
+    el.className = 'article-card';
+    el.href = article.sourceUrl;
+    el.target = '_blank';
+    el.rel = 'noopener noreferrer';
+    el.innerHTML = `
+      <div class="article-card-img">
+        <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" loading="lazy">
+      </div>
+      <p class="article-card-source">${escapeHtml(article.source)}</p>
+      <p class="article-card-title">${escapeHtml(article.title)}</p>
+    `;
+    editorialTrack.appendChild(el);
   });
 }
 
@@ -198,7 +231,7 @@ function handleScroll() {
 }
 
 // ---- Mobile nav toggle ----
-document.querySelector('.nav-toggle').addEventListener('click', function() {
+document.querySelector('.nav-toggle').addEventListener('click', function () {
   const links = document.querySelector('.nav-links');
   if (links.style.display === 'flex') {
     links.style.display = 'none';
@@ -218,19 +251,33 @@ document.querySelector('.nav-toggle').addEventListener('click', function() {
 
 // ---- Init ----
 async function init() {
-  const data = await fetchFashionFeeds();
+  // Load curated products from data file
+  allProducts = window.PRODUCTS || [];
+  featuredProduct = allProducts.find((p) => p.isFeatured) || allProducts[0];
+  const shopProducts = allProducts.filter((p) => p !== featuredProduct);
 
-  if (data && data.pickOfTheDay) {
-    pickOfTheDay = data.pickOfTheDay;
-    trendingItems = data.trending || [];
-  } else {
-    // Use fallback static data
-    pickOfTheDay = fallbackItems[0];
-    trendingItems = fallbackItems.slice(1);
-  }
+  // Render product sections immediately
+  renderHero(featuredProduct);
+  initFilters(shopProducts);
+  renderShopGrid(shopProducts);
 
-  renderHero(pickOfTheDay);
-  renderTrending();
+  // Render calendar
+  const events = window.EVENTS || [];
+  renderCalendar(events);
+
+  // Fetch editorial content async (non-blocking)
+  fetchFashionFeeds().then((data) => {
+    if (data) {
+      const articles = [data.pickOfTheDay, ...(data.trending || [])].filter((a) => a && a.imageUrl);
+      if (articles.length > 0) {
+        renderEditorial(articles);
+      } else {
+        editorialSection.style.display = 'none';
+      }
+    } else {
+      editorialSection.style.display = 'none';
+    }
+  });
 
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();

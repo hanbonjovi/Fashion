@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CHARMZ &mdash; Pick of the Day</title>
+  <title>CHARMZ &mdash; Curated Fashion</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,8 +16,9 @@
     <div class="nav-inner">
       <a href="#" class="logo">CHARMZ</a>
       <div class="nav-links">
-        <a href="#featured">Today's Pick</a>
-        <a href="#trending">Trending</a>
+        <a href="#new-drops">New Drops</a>
+        <a href="#calendar">Calendar</a>
+        <a href="#editorial">Editorial</a>
       </div>
       <button class="nav-toggle" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -30,58 +31,74 @@
     <div class="hero-image" id="hero-image"></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <p class="hero-label">Pick of the Day</p>
+      <p class="hero-label">Featured Drop</p>
       <h1 class="hero-title" id="hero-title"></h1>
       <p class="hero-subtitle" id="hero-subtitle"></p>
       <div class="hero-bottom">
         <div class="hero-meta">
-          <span class="hero-source" id="hero-source"></span>
-          <span class="hero-date" id="hero-date"></span>
+          <span class="hero-brand" id="hero-brand"></span>
+          <span class="hero-price" id="hero-price"></span>
         </div>
-        <a href="#" class="btn btn-hero" id="hero-cta" target="_blank" rel="noopener noreferrer">Read Article</a>
+        <a href="#" class="btn btn-hero" id="hero-cta" target="_blank" rel="noopener noreferrer">Shop Now</a>
       </div>
     </div>
   </header>
 
-  <!-- Details Panel -->
+  <!-- New Drops / Shop Grid -->
+  <section class="shop" id="new-drops">
+    <div class="section-header">
+      <p class="section-label">The Edit</p>
+      <h2 class="section-title">New Drops</h2>
+    </div>
+    <div class="shop-filters" id="shop-filters"></div>
+    <div class="shop-grid" id="shop-grid"></div>
+  </section>
+
+  <!-- Fashion Calendar -->
+  <section class="calendar" id="calendar">
+    <div class="section-header">
+      <p class="section-label">On the Calendar</p>
+      <h2 class="section-title">Upcoming</h2>
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+  </section>
+
+  <!-- Editorial (RSS) -->
+  <section class="editorial" id="editorial">
+    <div class="section-header">
+      <p class="section-label">From the Editors</p>
+      <h2 class="section-title">In the Press</h2>
+    </div>
+    <div class="editorial-scroll">
+      <div class="editorial-track" id="editorial-track"></div>
+    </div>
+  </section>
+
+  <!-- Detail Panel -->
   <section class="detail-panel" id="detail-panel">
     <button class="detail-close" id="detail-close">&times;</button>
     <div class="detail-inner">
       <div class="detail-gallery" id="detail-gallery"></div>
       <div class="detail-info">
-        <p class="detail-label">Featured Article</p>
+        <p class="detail-label" id="detail-label">Featured Drop</p>
         <h2 class="detail-title" id="detail-title"></h2>
-        <p class="detail-source-name" id="detail-source-name"></p>
+        <p class="detail-brand" id="detail-brand"></p>
+        <p class="detail-price" id="detail-price"></p>
         <p class="detail-description" id="detail-description"></p>
         <div class="detail-specs">
           <div class="spec">
-            <span class="spec-label">Source</span>
-            <span class="spec-value" id="detail-source"></span>
-          </div>
-          <div class="spec">
-            <span class="spec-label">Published</span>
-            <span class="spec-value" id="detail-date"></span>
+            <span class="spec-label">Brand</span>
+            <span class="spec-value" id="detail-spec-brand"></span>
           </div>
           <div class="spec">
             <span class="spec-label">Category</span>
-            <span class="spec-value" id="detail-category"></span>
+            <span class="spec-value" id="detail-spec-category"></span>
           </div>
         </div>
-        <div class="detail-price-row">
-          <a href="#" class="btn btn-primary btn-purchase" id="detail-read-more" target="_blank" rel="noopener noreferrer">Read Full Article &rarr;</a>
+        <div class="detail-actions">
+          <a href="#" class="btn btn-buy" id="detail-buy" target="_blank" rel="noopener noreferrer">Buy Now</a>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- Trending -->
-  <section class="trending" id="trending">
-    <div class="section-header">
-      <p class="section-label">What's Hot</p>
-      <h2 class="section-title">Trending Now</h2>
-    </div>
-    <div class="trending-marquee">
-      <div class="marquee-track" id="marquee-track"></div>
     </div>
   </section>
 
@@ -98,6 +115,7 @@
     </div>
   </footer>
 
+  <script src="data/products.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
