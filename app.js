@@ -4,17 +4,24 @@
    ======================================== */
 
 // ---- State ----
-let featuredProduct = null;
 let allProducts = [];
 let activeFilter = 'all';
+let heroSlides = [];
+let heroIndex = 0;
+let heroTimer = null;
 
 // ---- DOM Elements ----
+const heroLabel = document.getElementById('hero-label');
 const heroTitle = document.getElementById('hero-title');
 const heroSubtitle = document.getElementById('hero-subtitle');
 const heroBrand = document.getElementById('hero-brand');
 const heroPrice = document.getElementById('hero-price');
 const heroImage = document.getElementById('hero-image');
 const heroCta = document.getElementById('hero-cta');
+const heroDots = document.getElementById('hero-dots');
+const heroPrev = document.getElementById('hero-prev');
+const heroNext = document.getElementById('hero-next');
+const heroEl = document.querySelector('.hero');
 
 const detailPanel = document.getElementById('detail-panel');
 const detailClose = document.getElementById('detail-close');
@@ -66,25 +73,108 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-// ---- Render Hero ----
-function renderHero(product) {
+// ---- Hero Carousel ----
+function normalizeProductSlide(product) {
+  return {
+    type: 'product',
+    label: 'Featured Drop',
+    title: product.title,
+    subtitle: product.description,
+    meta1: product.brand,
+    meta2: formatPrice(product.price, product.currency),
+    imageUrl: product.imageUrl,
+    ctaUrl: product.buyUrl,
+    ctaText: 'Shop Now',
+  };
+}
+
+function normalizeArticleSlide(article) {
+  return {
+    type: 'article',
+    label: "Editor's Pick",
+    title: article.title,
+    subtitle: article.excerpt,
+    meta1: article.source,
+    meta2: '',
+    imageUrl: article.imageUrl,
+    ctaUrl: article.sourceUrl,
+    ctaText: 'Read Article',
+  };
+}
+
+function renderHeroSlide(index) {
+  const slide = heroSlides[index];
+  if (!slide) return;
+
   heroImage.style.opacity = '0';
   heroTitle.style.opacity = '0';
   heroSubtitle.style.opacity = '0';
 
   setTimeout(() => {
-    heroTitle.textContent = product.title;
-    heroSubtitle.textContent = product.description;
-    heroBrand.textContent = product.brand;
-    heroPrice.textContent = formatPrice(product.price, product.currency);
-    heroImage.style.backgroundImage = `url(${product.imageUrl})`;
-    heroCta.href = product.buyUrl;
+    heroLabel.textContent = slide.label;
+    heroTitle.textContent = slide.title;
+    heroSubtitle.textContent = slide.subtitle;
+    heroBrand.textContent = slide.meta1;
+    heroPrice.textContent = slide.meta2;
+    heroPrice.style.display = slide.meta2 ? '' : 'none';
+    heroImage.style.backgroundImage = `url(${slide.imageUrl})`;
+    heroCta.href = slide.ctaUrl;
+    heroCta.textContent = slide.ctaText;
 
     heroImage.style.opacity = '1';
     heroTitle.style.opacity = '1';
     heroSubtitle.style.opacity = '1';
   }, 300);
+
+  // Update dots
+  heroDots.querySelectorAll('.hero-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === index);
+  });
 }
+
+function buildDots() {
+  heroDots.innerHTML = '';
+  heroSlides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'hero-dot' + (i === heroIndex ? ' active' : '');
+    dot.setAttribute('aria-label', `Slide ${i + 1}`);
+    dot.addEventListener('click', () => goToSlide(i));
+    heroDots.appendChild(dot);
+  });
+}
+
+function goToSlide(index) {
+  heroIndex = index;
+  renderHeroSlide(heroIndex);
+  resetTimer();
+}
+
+function nextSlide() {
+  heroIndex = (heroIndex + 1) % heroSlides.length;
+  renderHeroSlide(heroIndex);
+}
+
+function prevSlide() {
+  heroIndex = (heroIndex - 1 + heroSlides.length) % heroSlides.length;
+  renderHeroSlide(heroIndex);
+}
+
+function startTimer() {
+  if (heroSlides.length <= 1) return;
+  heroTimer = setInterval(nextSlide, 6000);
+}
+
+function resetTimer() {
+  clearInterval(heroTimer);
+  startTimer();
+}
+
+// Arrow and hover handlers
+heroPrev.addEventListener('click', () => { prevSlide(); resetTimer(); });
+heroNext.addEventListener('click', () => { nextSlide(); resetTimer(); });
+
+heroEl.addEventListener('mouseenter', () => clearInterval(heroTimer));
+heroEl.addEventListener('mouseleave', () => startTimer());
 
 // ---- Detail Panel ----
 function openDetail(product) {
@@ -253,24 +343,44 @@ document.querySelector('.nav-toggle').addEventListener('click', function () {
 async function init() {
   // Load curated products from data file
   allProducts = window.PRODUCTS || [];
-  featuredProduct = allProducts.find((p) => p.isFeatured) || allProducts[0];
+  const featuredProduct = allProducts.find((p) => p.isFeatured) || allProducts[0];
   const shopProducts = allProducts.filter((p) => p !== featuredProduct);
 
-  // Render product sections immediately
-  renderHero(featuredProduct);
+  // Build initial hero slides from featured + new products
+  const heroProducts = allProducts.filter((p) => p.isFeatured || p.isNew).slice(0, 4);
+  heroSlides = heroProducts.map(normalizeProductSlide);
+
+  // Render first slide + dots immediately
+  buildDots();
+  renderHeroSlide(0);
+  startTimer();
+
+  // Render shop + calendar
   initFilters(shopProducts);
   renderShopGrid(shopProducts);
+  renderCalendar(window.EVENTS || []);
 
-  // Render calendar
-  const events = window.EVENTS || [];
-  renderCalendar(events);
-
-  // Fetch editorial content async (non-blocking)
+  // Fetch editorial content async — add top articles to carousel
   fetchFashionFeeds().then((data) => {
     if (data) {
       const articles = [data.pickOfTheDay, ...(data.trending || [])].filter((a) => a && a.imageUrl);
       if (articles.length > 0) {
         renderEditorial(articles);
+
+        // Interleave top 3 articles into hero carousel
+        const topArticles = articles.slice(0, 3).map(normalizeArticleSlide);
+        const merged = [];
+        const products = [...heroSlides];
+        let pi = 0;
+        let ai = 0;
+        // Alternate: 2 products, 1 article
+        while (pi < products.length || ai < topArticles.length) {
+          if (pi < products.length) merged.push(products[pi++]);
+          if (pi < products.length) merged.push(products[pi++]);
+          if (ai < topArticles.length) merged.push(topArticles[ai++]);
+        }
+        heroSlides = merged;
+        buildDots();
       } else {
         editorialSection.style.display = 'none';
       }

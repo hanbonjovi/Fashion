@@ -246,6 +246,75 @@ body {
   border-color: var(--white);
 }
 
+/* ---- Hero Carousel Controls ---- */
+.hero-dots {
+  position: absolute;
+  bottom: 2rem;
+  right: 4rem;
+  z-index: 3;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s var(--transition);
+}
+
+.hero-dot:hover {
+  border-color: var(--white);
+}
+
+.hero-dot.active {
+  background: var(--white);
+  border-color: var(--white);
+  transform: scale(1.2);
+}
+
+.hero-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  color: var(--white);
+  font-size: 1.5rem;
+  cursor: pointer;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition: all 0.3s var(--transition);
+  opacity: 0;
+}
+
+.hero:hover .hero-arrow {
+  opacity: 1;
+}
+
+.hero-arrow:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.hero-arrow-left {
+  left: 1.5rem;
+}
+
+.hero-arrow-right {
+  right: 1.5rem;
+}
+
 /* ---- Buttons ---- */
 .btn {
   display: inline-block;
