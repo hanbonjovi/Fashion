@@ -339,10 +339,28 @@ document.querySelector('.nav-toggle').addEventListener('click', function () {
   }
 });
 
+// ---- Data Fetching ----
+async function fetchCatalog() {
+  try {
+    const response = await fetch('/.netlify/functions/get-catalog');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  } catch (err) {
+    console.warn('Catalog API unavailable, using static fallback:', err.message);
+    return {
+      products: window.PRODUCTS || [],
+      events: window.EVENTS || [],
+    };
+  }
+}
+
 // ---- Init ----
 async function init() {
-  // Load curated products from data file
-  allProducts = window.PRODUCTS || [];
+  // Load catalog from API (falls back to static data)
+  const catalog = await fetchCatalog();
+  allProducts = catalog.products;
+  const events = catalog.events;
+
   const featuredProduct = allProducts.find((p) => p.isFeatured) || allProducts[0];
   const shopProducts = allProducts.filter((p) => p !== featuredProduct);
 
@@ -358,7 +376,7 @@ async function init() {
   // Render shop + calendar
   initFilters(shopProducts);
   renderShopGrid(shopProducts);
-  renderCalendar(window.EVENTS || []);
+  renderCalendar(events);
 
   // Fetch editorial content async — add top articles to carousel
   fetchFashionFeeds().then((data) => {
