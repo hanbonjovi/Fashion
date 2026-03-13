@@ -472,36 +472,6 @@ body {
   color: var(--warm-gray);
 }
 
-/* ---- Social Feed ---- */
-.social-feed {
-  padding: 6rem 2rem;
-  background: var(--cream);
-  text-align: center;
-}
-
-.social-embed-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.social-placeholder {
-  padding: 4rem 2rem;
-  border: 2px dashed var(--warm-gray);
-  border-radius: 8px;
-  color: var(--text-light);
-}
-
-.social-placeholder-text {
-  font-family: var(--serif);
-  font-size: 1.25rem;
-  margin-bottom: 0.5rem;
-}
-
-.social-placeholder-hint {
-  font-size: 0.85rem;
-  font-weight: 300;
-}
-
 /* ---- Footer ---- */
 .footer {
   padding: 4rem 2rem;
@@ -635,9 +605,5 @@ body {
   .btn-purchase {
     width: 100%;
     text-align: center;
-  }
-
-  .social-feed {
-    padding: 4rem 1.5rem;
   }
 }
