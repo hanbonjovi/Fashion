@@ -1,5 +1,5 @@
 /* ========================================
-   CHARMZ — Fashion of the Day
+   CHARMZ — Pick of the Day
    App logic, data, and interactivity
    ======================================== */
 
@@ -141,7 +141,6 @@ const detailPrice = document.getElementById('detail-price');
 const detailPurchase = document.getElementById('detail-purchase');
 const detailGallery = document.getElementById('detail-gallery');
 
-const collectionGrid = document.getElementById('collection-grid');
 const marqueeTrack = document.getElementById('marquee-track');
 
 // ---- Render Hero ----
@@ -154,7 +153,7 @@ function renderHero(index, direction = 'none') {
 
   setTimeout(() => {
     heroTitle.textContent = item.name;
-    heroSubtitle.textContent = item.description.substring(0, 120) + '...';
+    heroSubtitle.textContent = item.description;
     heroPrice.textContent = `$${item.price.toLocaleString()}`;
     heroDesigner.textContent = item.designer;
     heroImage.style.backgroundImage = `url(${item.image})`;
@@ -224,39 +223,11 @@ detailPanel.addEventListener('click', (e) => {
   if (e.target === detailPanel) closeDetail();
 });
 
-// ---- Collection Grid ----
-function renderCollection() {
-  collectionGrid.innerHTML = '';
-
-  fashionItems.forEach((item, index) => {
-    const card = document.createElement('div');
-    card.className = 'collection-card fade-in';
-    card.innerHTML = `
-      <div class="card-image-wrapper">
-        <img class="card-image" src="${item.image}" alt="${item.name}" loading="lazy">
-      </div>
-      <div class="card-info">
-        <h3 class="card-name">${item.name}</h3>
-        <p class="card-designer">${item.designer}</p>
-        <div class="card-bottom">
-          <span class="card-price">$${item.price.toLocaleString()}</span>
-          <span class="card-shop">View Details &rarr;</span>
-        </div>
-      </div>
-    `;
-    card.addEventListener('click', () => openDetail(index));
-    collectionGrid.appendChild(card);
-  });
-}
-
-// ---- Trending Marquee ----
-function renderMarquee() {
+// ---- Trending ----
+function renderTrending() {
   marqueeTrack.innerHTML = '';
 
-  // Duplicate for seamless loop
-  const items = [...fashionItems, ...fashionItems];
-
-  items.forEach((item, index) => {
+  fashionItems.forEach((item, index) => {
     const el = document.createElement('div');
     el.className = 'marquee-item';
     el.innerHTML = `
@@ -266,7 +237,7 @@ function renderMarquee() {
       <p class="marquee-name">${item.name}</p>
       <p class="marquee-price">$${item.price.toLocaleString()}</p>
     `;
-    el.addEventListener('click', () => openDetail(index % fashionItems.length));
+    el.addEventListener('click', () => openDetail(index));
     marqueeTrack.appendChild(el);
   });
 }
@@ -275,27 +246,6 @@ function renderMarquee() {
 function handleScroll() {
   const nav = document.querySelector('.nav');
   nav.classList.toggle('scrolled', window.scrollY > 50);
-
-  // Fade in collection cards
-  document.querySelectorAll('.fade-in').forEach(el => {
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight - 80) {
-      el.classList.add('visible');
-    }
-  });
-}
-
-// Pause marquee on hover
-function setupMarqueeHover() {
-  const marquee = document.querySelector('.trending-marquee');
-  if (marquee) {
-    marquee.addEventListener('mouseenter', () => {
-      marqueeTrack.style.animationPlayState = 'paused';
-    });
-    marquee.addEventListener('mouseleave', () => {
-      marqueeTrack.style.animationPlayState = 'running';
-    });
-  }
 }
 
 // ---- Mobile nav toggle ----
@@ -325,9 +275,7 @@ function init() {
   currentIndex = currentIndex % fashionItems.length;
 
   renderHero(currentIndex);
-  renderCollection();
-  renderMarquee();
-  setupMarqueeHover();
+  renderTrending();
 
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();
