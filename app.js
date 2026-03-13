@@ -1,5 +1,5 @@
 /* ========================================
-   MAISON — Fashion of the Day
+   CHARMZ — Fashion of the Day
    App logic, data, and interactivity
    ======================================== */
 
