@@ -1,0 +1,82 @@
+[
+  {
+    "id": "nyfw-ss27",
+    "name": "New York Fashion Week",
+    "subtitle": "Spring/Summer 2027",
+    "location": "New York",
+    "startDate": "2026-09-11",
+    "endDate": "2026-09-16",
+    "type": "fashion-week",
+    "url": "https://nyfw.com"
+  },
+  {
+    "id": "lfw-ss27",
+    "name": "London Fashion Week",
+    "subtitle": "Spring/Summer 2027",
+    "location": "London",
+    "startDate": "2026-09-18",
+    "endDate": "2026-09-22",
+    "type": "fashion-week",
+    "url": "https://londonfashionweek.co.uk"
+  },
+  {
+    "id": "mfw-ss27",
+    "name": "Milan Fashion Week",
+    "subtitle": "Spring/Summer 2027",
+    "location": "Milan",
+    "startDate": "2026-09-23",
+    "endDate": "2026-09-29",
+    "type": "fashion-week",
+    "url": "https://www.cameramoda.it"
+  },
+  {
+    "id": "pfw-ss27",
+    "name": "Paris Fashion Week",
+    "subtitle": "Spring/Summer 2027",
+    "location": "Paris",
+    "startDate": "2026-09-28",
+    "endDate": "2026-10-06",
+    "type": "fashion-week",
+    "url": "https://ffrp.paris"
+  },
+  {
+    "id": "chanel-metiers-dart-26",
+    "name": "Chanel Métiers d'Art",
+    "subtitle": "2026/27 Collection",
+    "location": "Tokyo",
+    "startDate": "2026-06-03",
+    "endDate": "2026-06-03",
+    "type": "brand-event",
+    "url": "https://www.chanel.com"
+  },
+  {
+    "id": "dior-cruise-27",
+    "name": "Dior Cruise",
+    "subtitle": "2027 Collection",
+    "location": "Athens",
+    "startDate": "2026-05-15",
+    "endDate": "2026-05-15",
+    "type": "brand-event",
+    "url": "https://www.dior.com"
+  },
+  {
+    "id": "pitti-uomo-110",
+    "name": "Pitti Uomo 110",
+    "subtitle": "Menswear Trade Show",
+    "location": "Florence",
+    "startDate": "2026-06-16",
+    "endDate": "2026-06-19",
+    "type": "trade-show",
+    "url": "https://www.pittimmagine.com"
+  },
+  {
+    "id": "met-gala-2026",
+    "name": "Met Gala",
+    "subtitle": "Costume Institute Benefit",
+    "location": "New York",
+    "startDate": "2026-05-04",
+    "endDate": "2026-05-04",
+    "type": "brand-event",
+    "url": "https://www.metmuseum.org"
+  }
+]
