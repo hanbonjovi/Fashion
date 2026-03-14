@@ -5,6 +5,3 @@
 [functions]
   node_bundler = "esbuild"
   included_files = ["data/**"]
-
-[functions."refresh-catalog"]
-  schedule = "0 */6 * * *"
