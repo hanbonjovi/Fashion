@@ -289,6 +289,9 @@ const RSS_FEEDS = [
   { url: 'https://hypebeast.com/fashion/feed', source: 'Hypebeast' },
   { url: 'https://www.whowhatwear.com/rss', source: 'Who What Wear' },
   { url: 'https://www.highsnobiety.com/rss/', source: 'Highsnobiety' },
+  { url: 'https://fashionista.com/.rss/full/', source: 'Fashionista' },
+  { url: 'https://www.businessoffashion.com/feed', source: 'BoF' },
+  { url: 'https://wwd.com/feed/', source: 'WWD' },
 ];
 
 const BRAND_NAMES = [
@@ -394,10 +397,26 @@ async function fetchFashionFeeds() {
 
     if (allItems.length === 0) return null;
 
-    const articles = allItems
+    // Group articles by source, take top 3 from each, then interleave
+    const articlesBySource = {};
+    allItems
       .map(rssItemToArticle)
       .filter((a) => a.imageUrl)
-      .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+      .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+      .forEach((a) => {
+        if (!articlesBySource[a.source]) articlesBySource[a.source] = [];
+        if (articlesBySource[a.source].length < 3) articlesBySource[a.source].push(a);
+      });
+
+    // Round-robin interleave across sources
+    const sources = Object.values(articlesBySource);
+    const articles = [];
+    const maxLen = Math.max(...sources.map((s) => s.length));
+    for (let i = 0; i < maxLen; i++) {
+      for (const group of sources) {
+        if (i < group.length) articles.push(group[i]);
+      }
+    }
 
     const trendingProducts = allItems
       .map(rssItemToTrendingProduct)

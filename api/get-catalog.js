@@ -95,6 +95,9 @@ const RSS_FEEDS = [
   { url: 'https://www.vogue.com/feed/rss', source: 'Vogue' },
   { url: 'https://hypebeast.com/fashion/feed', source: 'Hypebeast' },
   { url: 'https://www.highsnobiety.com/rss/', source: 'Highsnobiety' },
+  { url: 'https://fashionista.com/.rss/full/', source: 'Fashionista' },
+  { url: 'https://www.businessoffashion.com/feed', source: 'BoF' },
+  { url: 'https://wwd.com/feed/', source: 'WWD' },
 ];
 
 const BRAND_NAMES = [
