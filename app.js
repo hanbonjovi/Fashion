@@ -280,14 +280,134 @@ function renderCalendar(events) {
   });
 }
 
-// ---- Editorial (RSS) ----
-async function fetchFashionFeeds() {
+// ---- RSS Feed Config ----
+const RSS_FEEDS = [
+  { url: 'https://www.vogue.com/feed/rss', source: 'Vogue' },
+  { url: 'https://hypebeast.com/fashion/feed', source: 'Hypebeast' },
+  { url: 'https://www.whowhatwear.com/rss', source: 'Who What Wear' },
+  { url: 'https://www.highsnobiety.com/rss/', source: 'Highsnobiety' },
+];
+
+const BRAND_NAMES = [
+  'Acne Studios', 'The Row', 'Lemaire', 'Khaite', 'Bottega Veneta',
+  'Jacquemus', 'Loewe', 'Toteme', 'Jil Sander', 'Ami Paris',
+  'Maison Margiela', 'Nanushka', 'Our Legacy', 'Studio Nicholson', 'Auralee',
+  'Prada', 'Gucci', 'Saint Laurent', 'Celine', 'Balenciaga',
+  'Miu Miu', 'Dior', 'Chanel', 'Hermes', 'Rick Owens',
+  'Fear of God', 'Stussy', 'Nike', 'Adidas', 'New Balance',
+  'Comme des Garcons', 'Issey Miyake', 'Sacai', 'Undercover',
+];
+
+function refineTitle(title) {
+  if (!title || title.length <= 50) return title;
+  const separators = /\s*[—–\-:]\s*/;
+  const parts = title.split(separators).filter((p) => p.length > 5);
+  if (parts.length > 1) {
+    const fashionWords = /\b(dress|coat|blazer|jacket|trouser|pant|skirt|bag|tote|shoe|boot|sneaker|knit|sweater|cardigan|shirt|denim|jean|suit|silk|leather|cashmere|linen|wool|cotton|collection|collab|style|look|outfit|wear|trend|chic|luxur|designer|runway|spring|summer|fall|winter|resort)\b/i;
+    const fashionPart = parts.find((p) => fashionWords.test(p));
+    if (fashionPart && fashionPart.length >= 15) return fashionPart.trim();
+    const longest = parts.reduce((a, b) => (a.length >= b.length ? a : b));
+    if (longest.length <= 80) return longest.trim();
+  }
+  if (title.length > 80) {
+    return title.substring(0, 80).replace(/\s+\S*$/, '') + '...';
+  }
+  return title;
+}
+
+function detectBrand(text) {
+  const lower = text.toLowerCase();
+  for (const brand of BRAND_NAMES) {
+    if (lower.includes(brand.toLowerCase())) return brand;
+  }
+  return null;
+}
+
+async function fetchRssFeed(feedConfig) {
   try {
-    const response = await fetch('/api/fetch-fashion-feeds');
+    const apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feedConfig.url);
+    const response = await fetch(apiUrl);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    if (data.fallback) return null;
-    return data;
+    if (data.status !== 'ok' || !data.items) return [];
+    return data.items.map((item) => ({ ...item, _source: feedConfig.source }));
+  } catch (err) {
+    console.warn(`Feed failed (${feedConfig.source}):`, err.message);
+    return [];
+  }
+}
+
+function rssItemToArticle(item) {
+  const imgMatch = (item.description || '').match(/<img[^>]+src=["']([^"']+)["']/);
+  const imageUrl = item.thumbnail || item.enclosure?.link || (imgMatch ? imgMatch[1] : null);
+  const excerpt = (item.description || '').replace(/<[^>]+>/g, '').trim().slice(0, 200);
+
+  return {
+    title: refineTitle(item.title || 'Untitled'),
+    excerpt: excerpt || 'Read more on the source site.',
+    source: item._source,
+    sourceUrl: item.link,
+    imageUrl,
+    publishedAt: item.pubDate || new Date().toISOString(),
+    category: item.categories?.[0] || 'Fashion',
+  };
+}
+
+function rssItemToTrendingProduct(item) {
+  const title = item.title || '';
+  const text = title + ' ' + (item.description || '').replace(/<[^>]+>/g, '');
+  const brand = detectBrand(text);
+  const imgMatch = (item.description || '').match(/<img[^>]+src=["']([^"']+)["']/);
+  const imageUrl = item.thumbnail || item.enclosure?.link || (imgMatch ? imgMatch[1] : null);
+  if (!brand || !imageUrl) return null;
+
+  const priceMatch = text.match(/\$[\d,]+/);
+  const price = priceMatch ? parseInt(priceMatch[0].replace(/[$,]/g, ''), 10) : 0;
+
+  return {
+    id: 'trending-' + title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40),
+    title: title.length > 60 ? title.slice(0, 60).replace(/\s+\S*$/, '') + '...' : title,
+    brand,
+    price,
+    currency: 'USD',
+    buyUrl: item.link || '',
+    imageUrl,
+    category: item.categories?.[0] || 'Fashion',
+    description: text.slice(0, 200) || 'Trending from ' + item._source,
+    isNew: true,
+    isFeatured: false,
+    isTrending: true,
+    source: item._source,
+  };
+}
+
+// ---- Editorial (RSS) — fetched client-side ----
+async function fetchFashionFeeds() {
+  try {
+    const results = await Promise.allSettled(RSS_FEEDS.map(fetchRssFeed));
+    const allItems = results
+      .filter((r) => r.status === 'fulfilled')
+      .flatMap((r) => r.value);
+
+    if (allItems.length === 0) return null;
+
+    const articles = allItems
+      .map(rssItemToArticle)
+      .filter((a) => a.imageUrl)
+      .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+
+    const trendingProducts = allItems
+      .map(rssItemToTrendingProduct)
+      .filter(Boolean)
+      .slice(0, 8);
+
+    if (articles.length === 0) return null;
+
+    return {
+      pickOfTheDay: articles[0],
+      trending: articles.slice(1, 12),
+      trendingProducts,
+    };
   } catch (err) {
     console.warn('RSS fetch failed:', err);
     return null;
@@ -378,7 +498,7 @@ async function init() {
   renderShopGrid(shopProducts);
   renderCalendar(events);
 
-  // Fetch editorial content async — add top articles to carousel
+  // Fetch editorial content async — add top articles to carousel + trending products
   fetchFashionFeeds().then((data) => {
     if (data) {
       const articles = [data.pickOfTheDay, ...(data.trending || [])].filter((a) => a && a.imageUrl);
@@ -391,7 +511,6 @@ async function init() {
         const products = [...heroSlides];
         let pi = 0;
         let ai = 0;
-        // Alternate: 2 products, 1 article
         while (pi < products.length || ai < topArticles.length) {
           if (pi < products.length) merged.push(products[pi++]);
           if (pi < products.length) merged.push(products[pi++]);
@@ -401,6 +520,17 @@ async function init() {
         buildDots();
       } else {
         editorialSection.style.display = 'none';
+      }
+
+      // Merge trending products into shop grid
+      if (data.trendingProducts && data.trendingProducts.length > 0) {
+        const existingIds = new Set(allProducts.map((p) => p.id));
+        const newTrending = data.trendingProducts.filter((p) => !existingIds.has(p.id));
+        allProducts = [...allProducts, ...newTrending];
+        const featuredProduct = allProducts.find((p) => p.isFeatured) || allProducts[0];
+        const shopProducts = allProducts.filter((p) => p !== featuredProduct);
+        initFilters(shopProducts);
+        renderShopGrid(activeFilter === 'all' ? shopProducts : shopProducts.filter((p) => p.category === activeFilter));
       }
     } else {
       editorialSection.style.display = 'none';
