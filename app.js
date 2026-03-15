@@ -40,6 +40,9 @@ const shopFilters = document.getElementById('shop-filters');
 const calendarGrid = document.getElementById('calendar-grid');
 const editorialTrack = document.getElementById('editorial-track');
 const editorialSection = document.getElementById('editorial');
+const shopLabel = document.getElementById('shop-label');
+const shopTitle = document.getElementById('shop-title');
+const shopMeta = document.getElementById('shop-meta');
 
 // ---- Helpers ----
 function formatPrice(price, currency) {
@@ -219,7 +222,7 @@ function renderShopGrid(products) {
     const el = document.createElement('div');
     el.className = 'product-card';
     el.innerHTML = `
-      ${product.isNew ? '<span class="product-card-badge">New</span>' : ''}
+      ${product.isTrending ? '<span class="product-card-badge trending">Trending</span>' : product.isNew ? '<span class="product-card-badge">New</span>' : ''}
       <div class="product-card-img">
         <img src="${escapeHtml(product.imageUrl)}" alt="${escapeHtml(product.title)}" loading="lazy">
       </div>
@@ -474,12 +477,36 @@ async function fetchCatalog() {
   }
 }
 
+// ---- Rotation Countdown ----
+function formatTimeUntil(isoDate) {
+  const diff = new Date(isoDate) - new Date();
+  if (diff <= 0) return 'Refreshing soon';
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  if (hours > 0) return `Next rotation in ${hours}h ${mins}m`;
+  return `Next rotation in ${mins}m`;
+}
+
 // ---- Init ----
 async function init() {
   // Load catalog from API (falls back to static data)
   const catalog = await fetchCatalog();
   allProducts = catalog.products;
   const events = catalog.events;
+
+  // Apply curation metadata to the UI
+  if (catalog.curation) {
+    const c = catalog.curation;
+    if (shopLabel) shopLabel.textContent = c.label;
+    if (shopTitle) shopTitle.textContent = 'New Drops';
+    if (shopMeta) {
+      shopMeta.textContent = `${c.rotationSize} curated from ${c.vaultSize} pieces \u00B7 ${formatTimeUntil(c.nextRotationAt)}`;
+      // Update countdown every minute
+      setInterval(() => {
+        shopMeta.textContent = `${c.rotationSize} curated from ${c.vaultSize} pieces \u00B7 ${formatTimeUntil(c.nextRotationAt)}`;
+      }, 60000);
+    }
+  }
 
   const featuredProduct = allProducts.find((p) => p.isFeatured) || allProducts[0];
   const shopProducts = allProducts.filter((p) => p !== featuredProduct);

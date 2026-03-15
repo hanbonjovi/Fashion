@@ -375,6 +375,22 @@ body {
   font-weight: 400;
 }
 
+.section-meta {
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--text-light);
+  margin-top: 0.75rem;
+  font-style: italic;
+  font-family: var(--serif);
+}
+
+.product-card-badge.trending {
+  background: transparent;
+  color: var(--accent-dark);
+  border: 1px solid var(--accent-dark);
+}
+
 /* ---- Shop Grid ---- */
 .shop {
   padding: 6rem 4rem;
