@@ -283,7 +283,7 @@ function renderCalendar(events) {
 // ---- Editorial (RSS) ----
 async function fetchFashionFeeds() {
   try {
-    const response = await fetch('/.netlify/functions/fetch-fashion-feeds');
+    const response = await fetch('/api/fetch-fashion-feeds');
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     if (data.fallback) return null;
@@ -342,7 +342,7 @@ document.querySelector('.nav-toggle').addEventListener('click', function () {
 // ---- Data Fetching ----
 async function fetchCatalog() {
   try {
-    const response = await fetch('/.netlify/functions/get-catalog');
+    const response = await fetch('/api/get-catalog');
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return await response.json();
   } catch (err) {
